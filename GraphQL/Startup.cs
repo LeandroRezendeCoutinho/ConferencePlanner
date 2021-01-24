@@ -22,7 +22,8 @@ namespace GraphQL
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlite("Data Source=conferences.db"));
             services
                 .AddGraphQLServer()
-                .AddQueryType<Query>();
+                .AddQueryType<Query>()
+                .AddMutationType<Mutation>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
