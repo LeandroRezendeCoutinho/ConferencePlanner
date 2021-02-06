@@ -7,6 +7,7 @@ using ConferencePlanner.GraphQL.Data;
 using ConferencePlanner.GraphQL.DataLoader;
 using HotChocolate;
 using HotChocolate.Types;
+using HotChocolate.Resolvers;
 
 namespace ConferencePlanner.GraphQL.Types
 {
@@ -15,8 +16,16 @@ namespace ConferencePlanner.GraphQL.Types
         protected override void Configure(IObjectTypeDescriptor<Speaker> descriptor)
         {
             descriptor
+                .ImplementsNode()
+                .IdField(t => t.Id)
+                .ResolveNode((ctx, id) =>
+                    ctx.DataLoader<SpeakerByIdDataLoader>()
+                        .LoadAsync(id, ctx.RequestAborted));
+
+            descriptor
                 .Field(t => t.SessionSpeakers)
-                .ResolveWith<SpeakerResolvers>(t => t.GetSessionsAsync(default!, default!, default!, default))
+                .ResolveWith<SpeakerResolvers>(t =>
+                    t.GetSessionsAsync(default!, default!, default!, default))
                 .UseDbContext<ApplicationDbContext>()
                 .Name("sessions");
         }
